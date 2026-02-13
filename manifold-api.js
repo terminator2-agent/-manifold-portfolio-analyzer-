@@ -280,6 +280,11 @@ function processPositions(rawData) {
                 daysUntilClose = (closeTime - currentTime) / (1000 * 60 * 60 * 24);
             }
             
+            // Calculate partial sell recommendation
+            const partialSell = calculatePartialSellRecommendation(
+                shares, outcome, pool, p, mechanism
+            );
+
             positions.push({
                 contractId,
                 question,
@@ -292,12 +297,79 @@ function processPositions(rawData) {
                 slippage,
                 probability,
                 daysUntilClose,
-                returnIfCorrect
+                returnIfCorrect,
+                partialSell
             });
         }
     }
     
     return positions;
+}
+
+/**
+ * Calculate the optimal partial sell for a position.
+ * When selling the full position causes high slippage, find the amount where
+ * selling gives the best value-per-share (marginal return drops below threshold).
+ * Returns { recommendedSellShares, recommendedSaleValue, partialSlippage, fullSlippage }
+ * or null if full sell is fine (slippage < 5%).
+ */
+function calculatePartialSellRecommendation(shares, outcome, pool, p, mechanism) {
+    if (!['cpmm-1', 'cpmm-multi-1'].includes(mechanism)) return null;
+    if (!pool || pool.YES <= 0 || pool.NO <= 0) return null;
+    if (shares < 1) return null;
+
+    const fullSaleValue = calculateSaleValue(shares, outcome, pool, p, mechanism);
+    const fairValue = calculateSimpleSaleValue(shares,
+        pool.NO / (pool.YES + pool.NO), outcome);
+
+    if (fairValue <= 0) return null;
+
+    const fullSlippage = (fairValue - fullSaleValue) / fairValue;
+
+    // Only recommend partial sell if full-sell slippage exceeds 5%
+    if (fullSlippage < 0.05) return null;
+
+    // Binary search for the sell amount where marginal slippage hits 5%
+    // We want the largest amount we can sell with average slippage <= 5%
+    const SLIPPAGE_TARGET = 0.05;
+    let lo = 0;
+    let hi = shares;
+    let bestShares = 0;
+    let bestValue = 0;
+
+    for (let i = 0; i < 40; i++) {
+        const mid = (lo + hi) / 2;
+        const saleVal = calculateSaleValue(mid, outcome, pool, p, mechanism);
+        const fairVal = calculateSimpleSaleValue(mid,
+            pool.NO / (pool.YES + pool.NO), outcome);
+
+        if (fairVal <= 0) { lo = mid; continue; }
+
+        const slip = (fairVal - saleVal) / fairVal;
+
+        if (slip <= SLIPPAGE_TARGET) {
+            bestShares = mid;
+            bestValue = saleVal;
+            lo = mid;
+        } else {
+            hi = mid;
+        }
+    }
+
+    if (bestShares < 1) return null;
+
+    const partialFairValue = calculateSimpleSaleValue(bestShares,
+        pool.NO / (pool.YES + pool.NO), outcome);
+    const partialSlippage = partialFairValue > 0
+        ? (partialFairValue - bestValue) / partialFairValue : 0;
+
+    return {
+        recommendedSellShares: Math.round(bestShares * 10) / 10,
+        recommendedSaleValue: Math.round(bestValue * 100) / 100,
+        partialSlippage: Math.round(partialSlippage * 10000) / 10000,
+        fullSlippage: Math.round(fullSlippage * 10000) / 10000,
+        percentOfPosition: Math.round((bestShares / shares) * 100)
+    };
 }
 
 /**
@@ -336,6 +408,7 @@ window.ManifoldAPI = {
     processPositions,
     getPositionsBelowMarginRate,
     getAllPositionsSorted,
+    calculatePartialSellRecommendation,
     MARGIN_RATE_ANNUAL,
     MARGIN_RATE_DAILY
 };

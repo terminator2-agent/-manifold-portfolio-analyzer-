@@ -411,6 +411,31 @@ footer a {
     opacity: 0.8;
 }
 
+/* Partial Sell Recommendation */
+.partial-none {
+    color: #ccc;
+}
+
+.partial-recommend {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--warning-color);
+}
+
+.partial-detail {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--text-secondary);
+}
+
+.partial-slippage {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--success-color);
+}
+
 /* Utility */
 .hidden {
     display: none !important;
@@ -449,7 +474,8 @@ footer a {
     }
     
     /* Hide some columns on mobile */
-    th:nth-child(5), td:nth-child(5) {
+    th:nth-child(5), td:nth-child(5),
+    th:nth-child(9), td:nth-child(9) {
         display: none;
     }
 }

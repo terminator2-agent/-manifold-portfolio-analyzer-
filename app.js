@@ -158,13 +158,17 @@ function setupSortHandlers() {
 function sortPositions(positions, key, direction) {
     const sorted = [...positions].sort((a, b) => {
         let aVal, bVal;
-        
+
         if (key === 'question') {
             aVal = a.question.toLowerCase();
             bVal = b.question.toLowerCase();
         } else if (key === 'payout') {
             aVal = a.shares;
             bVal = b.shares;
+        } else if (key === 'slippage') {
+            // Sort by full slippage (positions with partial sell recommendations first)
+            aVal = a.partialSell ? a.partialSell.fullSlippage : 0;
+            bVal = b.partialSell ? b.partialSell.fullSlippage : 0;
         } else {
             aVal = a[key];
             bVal = b[key];
@@ -225,6 +229,18 @@ function renderTableRows(positions) {
             returnClass = 'return-low';
         }
         
+        // Partial sell recommendation
+        let partialSellHtml = '<span class="partial-none">—</span>';
+        if (position.partialSell) {
+            const ps = position.partialSell;
+            partialSellHtml = `
+                <span class="partial-recommend" title="Full sell slippage: ${(ps.fullSlippage * 100).toFixed(1)}%">
+                    Sell ${ps.percentOfPosition}%
+                    <span class="partial-detail">(${ps.recommendedSellShares} shares → M$${ps.recommendedSaleValue.toFixed(0)})</span>
+                    <span class="partial-slippage">Slippage: ${(ps.fullSlippage * 100).toFixed(1)}% → ${(ps.partialSlippage * 100).toFixed(1)}%</span>
+                </span>`;
+        }
+
         row.innerHTML = `
             <td class="hide-cell"><button class="hide-btn" onclick="hideRow(this)" title="Hide this row">×</button></td>
             <td>${index + 1}</td>
@@ -243,6 +259,7 @@ function renderTableRows(positions) {
             <td class="right">M$${position.shares.toFixed(2)}</td>
             <td class="right">${Math.round(position.daysUntilClose || 0)}</td>
             <td class="right ${returnClass}">${returnPercent}%</td>
+            <td class="right">${partialSellHtml}</td>
         `;
         
         positionsBody.appendChild(row);
