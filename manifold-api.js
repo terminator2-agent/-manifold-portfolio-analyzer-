@@ -308,8 +308,8 @@ function processPositions(rawData) {
 
 /**
  * Calculate the optimal partial sell for a position.
- * Finds how many shares to sell so the REMAINING position's annualized
- * return-if-correct equals the target rate (default: margin rate ~10.9%).
+ * Finds the largest amount we can sell with average slippage <= 5%,
+ * so the REMAINING position's annualized return-if-correct >= the target rate.
  *
  * The logic: if selling everything gives a return below the target, but the
  * slippage from selling makes the full exit unattractive, there's a sweet spot
@@ -336,7 +336,7 @@ function calculatePartialSellRecommendation(shares, outcome, pool, p, mechanism,
 
     // Calculate full-sell metrics
     const fullSaleValue = calculateSaleValue(shares, outcome, pool, p, mechanism);
-    const probability = pool.NO / (pool.YES + pool.NO);
+    const probability = p;
     const fairValue = calculateSimpleSaleValue(shares, probability, outcome);
     if (fairValue <= 0 || fullSaleValue <= 0) return null;
 
@@ -369,6 +369,7 @@ function calculatePartialSellRecommendation(shares, outcome, pool, p, mechanism,
     let bestRemainingReturn = fullSellReturn;
 
     for (let i = 0; i < 40; i++) {
+        if (Math.abs(hi - lo) < 0.0001) break;
         const sellMid = (lo + hi) / 2;
         const remainingShares = shares - sellMid;
         if (remainingShares < 0.5) { hi = sellMid; continue; }
