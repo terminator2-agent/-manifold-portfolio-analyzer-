@@ -436,6 +436,12 @@ footer a {
     color: var(--success-color);
 }
 
+.partial-remaining {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--success-color);
+}
+
 /* Utility */
 .hidden {
     display: none !important;

@@ -166,9 +166,9 @@ function sortPositions(positions, key, direction) {
             aVal = a.shares;
             bVal = b.shares;
         } else if (key === 'slippage') {
-            // Sort by full slippage (positions with partial sell recommendations first)
-            aVal = a.partialSell ? a.partialSell.fullSlippage : 0;
-            bVal = b.partialSell ? b.partialSell.fullSlippage : 0;
+            // Sort by percent to sell (positions with partial sell recommendations first)
+            aVal = a.partialSell ? a.partialSell.percentToSell : 0;
+            bVal = b.partialSell ? b.partialSell.percentToSell : 0;
         } else {
             aVal = a[key];
             bVal = b[key];
@@ -233,11 +233,12 @@ function renderTableRows(positions) {
         let partialSellHtml = '<span class="partial-none">—</span>';
         if (position.partialSell) {
             const ps = position.partialSell;
+            const targetPct = (ps.targetReturn * 100).toFixed(1);
             partialSellHtml = `
-                <span class="partial-recommend" title="Full sell slippage: ${(ps.fullSlippage * 100).toFixed(1)}%">
-                    Sell ${ps.percentOfPosition}%
-                    <span class="partial-detail">(${ps.recommendedSellShares} shares → M$${ps.recommendedSaleValue.toFixed(0)})</span>
-                    <span class="partial-slippage">Slippage: ${(ps.fullSlippage * 100).toFixed(1)}% → ${(ps.partialSlippage * 100).toFixed(1)}%</span>
+                <span class="partial-recommend" title="Sell ${ps.percentToSell}% to bring remaining return to ${targetPct}%">
+                    Sell ${ps.recommendedSellShares} shares (${ps.percentToSell}%)
+                    <span class="partial-detail">→ M$${ps.recommendedSaleValue.toFixed(0)} proceeds (${(ps.sellSlippage * 100).toFixed(1)}% slippage)</span>
+                    <span class="partial-remaining">Keep ${ps.remainingShares} shares → ${(ps.remainingReturn * 100).toFixed(1)}% return</span>
                 </span>`;
         }
 

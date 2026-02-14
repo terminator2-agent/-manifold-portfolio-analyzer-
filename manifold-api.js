@@ -282,7 +282,7 @@ function processPositions(rawData) {
             
             // Calculate partial sell recommendation
             const partialSell = calculatePartialSellRecommendation(
-                shares, outcome, pool, p, mechanism
+                shares, outcome, pool, p, mechanism, closeTime
             );
 
             positions.push({
@@ -308,67 +308,108 @@ function processPositions(rawData) {
 
 /**
  * Calculate the optimal partial sell for a position.
- * When selling the full position causes high slippage, find the amount where
- * selling gives the best value-per-share (marginal return drops below threshold).
- * Returns { recommendedSellShares, recommendedSaleValue, partialSlippage, fullSlippage }
- * or null if full sell is fine (slippage < 5%).
+ * Finds how many shares to sell so the REMAINING position's annualized
+ * return-if-correct equals the target rate (default: margin rate ~10.9%).
+ *
+ * The logic: if selling everything gives a return below the target, but the
+ * slippage from selling makes the full exit unattractive, there's a sweet spot
+ * where you sell some shares (accepting slippage on those) and keep the rest
+ * at a position size where the remaining return hits the target.
+ *
+ * Returns { recommendedSellShares, recommendedSaleValue, remainingShares,
+ *           remainingReturn, fullSellReturn, fullSlippage }
+ * or null if partial sell isn't applicable.
  */
-function calculatePartialSellRecommendation(shares, outcome, pool, p, mechanism) {
+function calculatePartialSellRecommendation(shares, outcome, pool, p, mechanism, closeTime, targetReturn) {
     if (!['cpmm-1', 'cpmm-multi-1'].includes(mechanism)) return null;
     if (!pool || pool.YES <= 0 || pool.NO <= 0) return null;
     if (shares < 1) return null;
+    if (!closeTime) return null;
 
+    const currentTime = Date.now();
+    const daysUntilClose = (closeTime - currentTime) / (1000 * 60 * 60 * 24);
+    if (daysUntilClose <= 0) return null;
+
+    if (targetReturn === undefined || targetReturn === null) {
+        targetReturn = MARGIN_RATE_ANNUAL;
+    }
+
+    // Calculate full-sell metrics
     const fullSaleValue = calculateSaleValue(shares, outcome, pool, p, mechanism);
-    const fairValue = calculateSimpleSaleValue(shares,
-        pool.NO / (pool.YES + pool.NO), outcome);
-
-    if (fairValue <= 0) return null;
+    const probability = pool.NO / (pool.YES + pool.NO);
+    const fairValue = calculateSimpleSaleValue(shares, probability, outcome);
+    if (fairValue <= 0 || fullSaleValue <= 0) return null;
 
     const fullSlippage = (fairValue - fullSaleValue) / fairValue;
+    const fullSellReturn = calculateReturnIfCorrect(fullSaleValue, shares, closeTime, currentTime);
 
-    // Only recommend partial sell if full-sell slippage exceeds 5%
-    if (fullSlippage < 0.05) return null;
+    // Only recommend partial sell if:
+    // 1. Full-sell return is below target (otherwise selling everything is fine)
+    // 2. There's meaningful slippage (>2%) making partial sell worthwhile
+    if (fullSellReturn === null) return null;
+    if (fullSellReturn >= targetReturn) return null;
+    if (fullSlippage < 0.02) return null;
 
-    // Binary search for the sell amount where marginal slippage hits 5%
-    // We want the largest amount we can sell with average slippage <= 5%
-    const SLIPPAGE_TARGET = 0.05;
+    // Binary search: find how many shares to sell so the REMAINING position
+    // has a return-if-correct equal to the target rate.
+    //
+    // After selling `sellShares`, the remaining position has:
+    //   remainingShares = shares - sellShares
+    //   remainingSaleValue = calculateSaleValue(remainingShares, ..., adjustedPool)
+    //   remainingReturn = calculateReturnIfCorrect(remainingSaleValue, remainingShares, closeTime)
+    //
+    // But the pool changes after selling! Selling shares adjusts the AMM pool.
+    // For simplicity, we approximate by computing the remaining sale value
+    // against the original pool — this slightly overestimates remaining slippage
+    // (conservative, which is fine).
     let lo = 0;
-    let hi = shares;
-    let bestShares = 0;
-    let bestValue = 0;
+    let hi = shares - 1; // Must keep at least 1 share
+    let bestSellShares = 0;
+    let bestSellValue = 0;
+    let bestRemainingReturn = fullSellReturn;
 
     for (let i = 0; i < 40; i++) {
-        const mid = (lo + hi) / 2;
-        const saleVal = calculateSaleValue(mid, outcome, pool, p, mechanism);
-        const fairVal = calculateSimpleSaleValue(mid,
-            pool.NO / (pool.YES + pool.NO), outcome);
+        const sellMid = (lo + hi) / 2;
+        const remainingShares = shares - sellMid;
+        if (remainingShares < 0.5) { hi = sellMid; continue; }
 
-        if (fairVal <= 0) { lo = mid; continue; }
+        // Sale value of the remaining (smaller) position against original pool
+        const remainingSaleValue = calculateSaleValue(remainingShares, outcome, pool, p, mechanism);
+        if (remainingSaleValue <= 0) { hi = sellMid; continue; }
 
-        const slip = (fairVal - saleVal) / fairVal;
+        const remainingReturn = calculateReturnIfCorrect(remainingSaleValue, remainingShares, closeTime, currentTime);
+        if (remainingReturn === null) { hi = sellMid; continue; }
 
-        if (slip <= SLIPPAGE_TARGET) {
-            bestShares = mid;
-            bestValue = saleVal;
-            lo = mid;
+        if (remainingReturn < targetReturn) {
+            // Remaining return is too low — sell fewer shares (keep more)
+            hi = sellMid;
         } else {
-            hi = mid;
+            // Remaining return is at or above target — can sell more
+            bestSellShares = sellMid;
+            bestSellValue = calculateSaleValue(sellMid, outcome, pool, p, mechanism);
+            bestRemainingReturn = remainingReturn;
+            lo = sellMid;
         }
     }
 
-    if (bestShares < 1) return null;
+    if (bestSellShares < 1) return null;
 
-    const partialFairValue = calculateSimpleSaleValue(bestShares,
-        pool.NO / (pool.YES + pool.NO), outcome);
-    const partialSlippage = partialFairValue > 0
-        ? (partialFairValue - bestValue) / partialFairValue : 0;
+    const remainingShares = shares - bestSellShares;
+    const sellSlippage = (() => {
+        const sellFairValue = calculateSimpleSaleValue(bestSellShares, probability, outcome);
+        return sellFairValue > 0 ? (sellFairValue - bestSellValue) / sellFairValue : 0;
+    })();
 
     return {
-        recommendedSellShares: Math.round(bestShares * 10) / 10,
-        recommendedSaleValue: Math.round(bestValue * 100) / 100,
-        partialSlippage: Math.round(partialSlippage * 10000) / 10000,
+        recommendedSellShares: Math.round(bestSellShares * 10) / 10,
+        recommendedSaleValue: Math.round(bestSellValue * 100) / 100,
+        remainingShares: Math.round(remainingShares * 10) / 10,
+        remainingReturn: Math.round(bestRemainingReturn * 10000) / 10000,
+        fullSellReturn: fullSellReturn !== null ? Math.round(fullSellReturn * 10000) / 10000 : null,
         fullSlippage: Math.round(fullSlippage * 10000) / 10000,
-        percentOfPosition: Math.round((bestShares / shares) * 100)
+        sellSlippage: Math.round(sellSlippage * 10000) / 10000,
+        percentToSell: Math.round((bestSellShares / shares) * 100),
+        targetReturn: targetReturn
     };
 }
 
