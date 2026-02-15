@@ -308,14 +308,13 @@ function processPositions(rawData) {
 
 /**
  * Calculate the optimal partial sell for a position.
- * When selling the full position has a return-if-correct below the target rate
- * AND meaningful slippage (>2%), finds how many shares to sell so the REMAINING
- * position's annualized return-if-correct reaches the target rate (default 10.9%).
+ * When selling the full position has a return-if-correct below the target rate,
+ * finds how many shares to sell so the REMAINING position's annualized
+ * return-if-correct reaches the target rate (default 10.9%).
  *
- * The logic: if selling everything gives a return below the target, but the
- * slippage from selling makes the full exit unattractive, there's a sweet spot
- * where you sell some shares (accepting slippage on those) and keep the rest
- * at a position size where the remaining return hits the target.
+ * The logic: if a position's return is below the margin rate, selling some
+ * shares frees up capital while the remaining (smaller) position has a higher
+ * return-if-correct because fewer shares face less AMM slippage.
  *
  * @param {number} shares - Number of shares held
  * @param {string} outcome - 'YES' or 'NO'
@@ -351,12 +350,10 @@ function calculatePartialSellRecommendation(shares, outcome, pool, p, mechanism,
     const fullSlippage = (fairValue - fullSaleValue) / fairValue;
     const fullSellReturn = calculateReturnIfCorrect(fullSaleValue, shares, closeTime, currentTime);
 
-    // Only recommend partial sell if:
-    // 1. Full-sell return is below target (otherwise selling everything is fine)
-    // 2. There's meaningful slippage (>2%) making partial sell worthwhile
+    // Only recommend partial sell if full-sell return is below target
+    // (otherwise selling everything is fine)
     if (fullSellReturn === null) return null;
     if (fullSellReturn >= targetReturn) return null;
-    if (fullSlippage < 0.02) return null;
 
     // Binary search: find how many shares to sell so the REMAINING position
     // has a return-if-correct equal to the target rate.
