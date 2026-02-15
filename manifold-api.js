@@ -282,7 +282,7 @@ function processPositions(rawData) {
             
             // Calculate partial sell recommendation
             const partialSell = calculatePartialSellRecommendation(
-                shares, outcome, pool, p, mechanism, closeTime
+                shares, outcome, pool, p, mechanism, probability, closeTime
             );
 
             positions.push({
@@ -308,19 +308,28 @@ function processPositions(rawData) {
 
 /**
  * Calculate the optimal partial sell for a position.
- * Finds the largest amount we can sell with average slippage <= 5%,
- * so the REMAINING position's annualized return-if-correct >= the target rate.
+ * When selling the full position has a return-if-correct below the target rate
+ * AND meaningful slippage (>2%), finds how many shares to sell so the REMAINING
+ * position's annualized return-if-correct reaches the target rate (default 10.9%).
  *
  * The logic: if selling everything gives a return below the target, but the
  * slippage from selling makes the full exit unattractive, there's a sweet spot
  * where you sell some shares (accepting slippage on those) and keep the rest
  * at a position size where the remaining return hits the target.
  *
- * Returns { recommendedSellShares, recommendedSaleValue, remainingShares,
- *           remainingReturn, fullSellReturn, fullSlippage }
- * or null if partial sell isn't applicable.
+ * @param {number} shares - Number of shares held
+ * @param {string} outcome - 'YES' or 'NO'
+ * @param {object} pool - { YES, NO } pool amounts
+ * @param {number} p - CPMM mechanism parameter
+ * @param {string} mechanism - Market mechanism type
+ * @param {number} probability - Market probability (from contract.prob or answer.prob)
+ * @param {number} closeTime - Market close time in ms
+ * @param {number} [targetReturn] - Target annualized return (default: MARGIN_RATE_ANNUAL)
+ * @returns {{ recommendedSellShares, recommendedSaleValue, remainingShares,
+ *             remainingReturn, fullSellReturn, fullSlippage, sellSlippage,
+ *             percentToSell, targetReturn } | null}
  */
-function calculatePartialSellRecommendation(shares, outcome, pool, p, mechanism, closeTime, targetReturn) {
+function calculatePartialSellRecommendation(shares, outcome, pool, p, mechanism, probability, closeTime, targetReturn) {
     if (!['cpmm-1', 'cpmm-multi-1'].includes(mechanism)) return null;
     if (!pool || pool.YES <= 0 || pool.NO <= 0) return null;
     if (shares < 1) return null;
@@ -334,9 +343,8 @@ function calculatePartialSellRecommendation(shares, outcome, pool, p, mechanism,
         targetReturn = MARGIN_RATE_ANNUAL;
     }
 
-    // Calculate full-sell metrics
+    // Calculate full-sell metrics using the contract's probability for fair value
     const fullSaleValue = calculateSaleValue(shares, outcome, pool, p, mechanism);
-    const probability = p;
     const fairValue = calculateSimpleSaleValue(shares, probability, outcome);
     if (fairValue <= 0 || fullSaleValue <= 0) return null;
 
@@ -360,7 +368,7 @@ function calculatePartialSellRecommendation(shares, outcome, pool, p, mechanism,
     //
     // But the pool changes after selling! Selling shares adjusts the AMM pool.
     // For simplicity, we approximate by computing the remaining sale value
-    // against the original pool — this slightly overestimates remaining slippage
+    // against the original pool -- this slightly overestimates remaining slippage
     // (conservative, which is fine).
     let lo = 0;
     let hi = shares - 1; // Must keep at least 1 share
@@ -382,10 +390,10 @@ function calculatePartialSellRecommendation(shares, outcome, pool, p, mechanism,
         if (remainingReturn === null) { hi = sellMid; continue; }
 
         if (remainingReturn < targetReturn) {
-            // Remaining return is too low — sell fewer shares (keep more)
+            // Remaining return is too low -- sell fewer shares (keep more)
             hi = sellMid;
         } else {
-            // Remaining return is at or above target — can sell more
+            // Remaining return is at or above target -- can sell more
             bestSellShares = sellMid;
             bestSellValue = calculateSaleValue(sellMid, outcome, pool, p, mechanism);
             bestRemainingReturn = remainingReturn;

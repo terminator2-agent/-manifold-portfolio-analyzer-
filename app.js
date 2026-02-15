@@ -165,7 +165,7 @@ function sortPositions(positions, key, direction) {
         } else if (key === 'payout') {
             aVal = a.shares;
             bVal = b.shares;
-        } else if (key === 'slippage') {
+        } else if (key === 'partialSell') {
             // Sort by percent to sell (positions with partial sell recommendations first)
             aVal = a.partialSell ? a.partialSell.percentToSell : 0;
             bVal = b.partialSell ? b.partialSell.percentToSell : 0;
