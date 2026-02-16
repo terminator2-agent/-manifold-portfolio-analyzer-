@@ -1,0 +1,829 @@
+/* ============================================
+   Theme Switcher UI
+   ============================================ */
+
+.theme-switcher {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.theme-switcher label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.theme-switcher select {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--card-bg);
+    color: var(--text-primary);
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.theme-switcher select:focus {
+    border-color: var(--primary-color);
+}
+
+/* ============================================
+   THEME: Money
+   Green & gold, serif fonts, dollar sign vibes
+   ============================================ */
+
+body.theme-money {
+    --primary-color: #2e7d32;
+    --primary-dark: #1b5e20;
+    --background: #f1f8e9;
+    --card-bg: #ffffff;
+    --text-primary: #1b3a1b;
+    --text-secondary: #4a6741;
+    --border-color: #c8e6c9;
+    --success-color: #2e7d32;
+    --error-color: #c62828;
+    --warning-color: #f9a825;
+    font-family: 'Georgia', 'Times New Roman', Times, serif;
+}
+
+body.theme-money .container {
+    background-image:
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 40px,
+            rgba(46, 125, 50, 0.02) 40px,
+            rgba(46, 125, 50, 0.02) 80px
+        );
+}
+
+body.theme-money header h1::before {
+    content: '\1F4B0 ';
+}
+
+body.theme-money header h1::after {
+    content: ' \1F4B0';
+}
+
+body.theme-money .stat-value {
+    color: #2e7d32;
+    text-shadow: 1px 1px 0 rgba(255, 215, 0, 0.3);
+}
+
+body.theme-money .stat-box {
+    border: 1px solid #c8e6c9;
+    background: linear-gradient(135deg, #ffffff, #f1f8e9);
+}
+
+body.theme-money .summary {
+    background: linear-gradient(135deg, #2e7d32, #1b5e20, #33691e);
+}
+
+body.theme-money .input-group button {
+    background: linear-gradient(135deg, #2e7d32, #388e3c);
+    font-family: 'Georgia', serif;
+}
+
+body.theme-money .input-group button:hover {
+    background: linear-gradient(135deg, #1b5e20, #2e7d32);
+}
+
+body.theme-money footer {
+    border-top: 2px solid #c8e6c9;
+}
+
+/* ============================================
+   THEME: MySpace 2005
+   Neon, Comic Sans, glitter, chaos
+   ============================================ */
+
+body.theme-myspace {
+    --primary-color: #ff00ff;
+    --primary-dark: #cc00cc;
+    --background: #000033;
+    --card-bg: #0a0a3a;
+    --text-primary: #00ff00;
+    --text-secondary: #ffff00;
+    --border-color: #ff00ff;
+    --success-color: #00ff00;
+    --error-color: #ff3333;
+    --warning-color: #ffff00;
+    font-family: 'Comic Sans MS', 'Chalkboard SE', cursive;
+}
+
+body.theme-myspace {
+    background: #000033;
+    background-image:
+        radial-gradient(2px 2px at 20px 30px, #ffffff, transparent),
+        radial-gradient(2px 2px at 40px 70px, #ff00ff, transparent),
+        radial-gradient(1px 1px at 90px 40px, #00ffff, transparent),
+        radial-gradient(2px 2px at 130px 80px, #ffff00, transparent),
+        radial-gradient(1px 1px at 160px 20px, #ffffff, transparent),
+        radial-gradient(2px 2px at 200px 60px, #ff00ff, transparent);
+    background-size: 200px 100px;
+}
+
+body.theme-myspace header h1 {
+    color: #ff00ff;
+    text-shadow:
+        0 0 10px #ff00ff,
+        0 0 20px #ff00ff,
+        0 0 40px #ff00ff;
+    animation: myspace-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes myspace-glow {
+    from { text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff; }
+    to { text-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff, 0 0 60px #00ffff; }
+}
+
+body.theme-myspace .input-section {
+    border: 3px dashed #ff00ff;
+    background: rgba(10, 10, 58, 0.9);
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
+}
+
+body.theme-myspace .input-group input {
+    background: #0a0a3a;
+    color: #00ff00;
+    border-color: #00ffff;
+}
+
+body.theme-myspace .input-group button {
+    background: linear-gradient(135deg, #ff00ff, #ff6600);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    animation: myspace-btn 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes myspace-btn {
+    from { transform: scale(1); }
+    to { transform: scale(1.05); }
+}
+
+body.theme-myspace .summary {
+    background: linear-gradient(135deg, #ff00ff, #6600cc, #0066ff);
+    border: 2px solid #00ffff;
+}
+
+body.theme-myspace .stat-box {
+    background: #0a0a3a;
+    border: 2px solid #ff00ff;
+    box-shadow: 0 0 10px rgba(255, 0, 255, 0.3);
+}
+
+body.theme-myspace .stat-value {
+    color: #00ff00;
+    text-shadow: 0 0 10px #00ff00;
+}
+
+body.theme-myspace .stats-row {
+    background: #000044;
+}
+
+body.theme-myspace thead {
+    background: #0a0a3a;
+}
+
+body.theme-myspace th {
+    color: #ffff00;
+    border-bottom-color: #ff00ff;
+}
+
+body.theme-myspace td {
+    border-bottom-color: #333366;
+}
+
+body.theme-myspace tbody tr:hover {
+    background: #1a1a4a;
+}
+
+body.theme-myspace .market-link {
+    color: #00ffff;
+}
+
+body.theme-myspace .results {
+    border: 2px solid #ff00ff;
+    box-shadow: 0 0 15px rgba(255, 0, 255, 0.2);
+}
+
+body.theme-myspace .position-yes {
+    background: #003300;
+    color: #00ff00;
+    border: 1px solid #00ff00;
+}
+
+body.theme-myspace .position-no {
+    background: #330000;
+    color: #ff3333;
+    border: 1px solid #ff3333;
+}
+
+body.theme-myspace .theme-switcher select {
+    background: #0a0a3a;
+    color: #00ff00;
+    border-color: #ff00ff;
+}
+
+body.theme-myspace footer {
+    color: #9999ff;
+}
+
+body.theme-myspace footer a {
+    color: #00ffff;
+}
+
+/* ============================================
+   THEME: Lisa Frank Notebook
+   Pastels, rainbows, bubbly, sparkle
+   ============================================ */
+
+body.theme-lisafrank {
+    --primary-color: #e040fb;
+    --primary-dark: #aa00ff;
+    --background: #fce4ec;
+    --card-bg: #ffffff;
+    --text-primary: #4a148c;
+    --text-secondary: #7b1fa2;
+    --border-color: #f8bbd0;
+    --success-color: #00c853;
+    --error-color: #ff1744;
+    --warning-color: #ffab00;
+    font-family: 'Trebuchet MS', 'Lucida Grande', 'Lucida Sans', sans-serif;
+}
+
+body.theme-lisafrank {
+    background: linear-gradient(135deg,
+        #fce4ec 0%,
+        #e1f5fe 20%,
+        #f3e5f5 40%,
+        #fff9c4 60%,
+        #e8f5e9 80%,
+        #fce4ec 100%
+    );
+    background-size: 400% 400%;
+    animation: lisafrank-bg 15s ease infinite;
+}
+
+@keyframes lisafrank-bg {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+body.theme-lisafrank header h1 {
+    background: linear-gradient(90deg, #ff1744, #ff9100, #ffea00, #00e676, #2979ff, #d500f9);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: lisafrank-rainbow 3s linear infinite;
+}
+
+@keyframes lisafrank-rainbow {
+    to { background-position: 200% center; }
+}
+
+body.theme-lisafrank .input-section {
+    background: linear-gradient(135deg, #fff, #fce4ec, #e1f5fe);
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    box-shadow: 0 4px 15px rgba(224, 64, 251, 0.2);
+    position: relative;
+}
+
+body.theme-lisafrank .input-section::before {
+    content: '';
+    position: absolute;
+    top: -3px; left: -3px; right: -3px; bottom: -3px;
+    background: linear-gradient(135deg, #ff1744, #ff9100, #ffea00, #00e676, #2979ff, #d500f9);
+    border-radius: 14px;
+    z-index: -1;
+}
+
+body.theme-lisafrank .input-group button {
+    background: linear-gradient(135deg, #e040fb, #aa00ff);
+    border-radius: 20px;
+}
+
+body.theme-lisafrank .input-group button:hover {
+    background: linear-gradient(135deg, #aa00ff, #6200ea);
+    transform: scale(1.05);
+    transition: all 0.2s;
+}
+
+body.theme-lisafrank .input-group input {
+    border-radius: 20px;
+    border-color: #e1bee7;
+}
+
+body.theme-lisafrank .summary {
+    background: linear-gradient(135deg, #e040fb, #7c4dff, #448aff, #18ffff);
+}
+
+body.theme-lisafrank .stat-box {
+    border-radius: 16px;
+    background: linear-gradient(135deg, #fff, #fce4ec);
+    border: 2px solid #f8bbd0;
+}
+
+body.theme-lisafrank .stat-value {
+    background: linear-gradient(135deg, #e040fb, #7c4dff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+body.theme-lisafrank .stats-row {
+    background: linear-gradient(135deg, #fce4ec, #e1f5fe);
+}
+
+body.theme-lisafrank .results {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(224, 64, 251, 0.15);
+}
+
+body.theme-lisafrank tbody tr:hover {
+    background: #fce4ec;
+}
+
+body.theme-lisafrank .market-link {
+    color: #7c4dff;
+}
+
+body.theme-lisafrank .position-yes {
+    background: linear-gradient(135deg, #c8e6c9, #a5d6a7);
+    border-radius: 12px;
+}
+
+body.theme-lisafrank .position-no {
+    background: linear-gradient(135deg, #ffcdd2, #ef9a9a);
+    border-radius: 12px;
+}
+
+body.theme-lisafrank .theme-switcher select {
+    border-color: #e1bee7;
+    border-radius: 20px;
+}
+
+/* ============================================
+   THEME: Running Out of Oxygen
+   Dark reds to black, urgent, depleting bar
+   ============================================ */
+
+body.theme-oxygen {
+    --primary-color: #d32f2f;
+    --primary-dark: #b71c1c;
+    --background: #1a0a0a;
+    --card-bg: #2d1111;
+    --text-primary: #ffcdd2;
+    --text-secondary: #ef9a9a;
+    --border-color: #4a1c1c;
+    --success-color: #66bb6a;
+    --error-color: #ff5252;
+    --warning-color: #ff6e40;
+    font-family: 'Consolas', 'Courier New', monospace;
+}
+
+body.theme-oxygen {
+    background: #1a0a0a;
+    animation: oxygen-pulse 4s ease-in-out infinite;
+}
+
+@keyframes oxygen-pulse {
+    0%, 100% { background-color: #1a0a0a; }
+    50% { background-color: #2a0e0e; }
+}
+
+/* Oxygen bar at the top of the page */
+body.theme-oxygen::before {
+    content: 'O\2082  REMAINING';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 28px;
+    background: linear-gradient(90deg,
+        #d32f2f 0%,
+        #d32f2f var(--oxygen-level, 35%),
+        #4a1c1c var(--oxygen-level, 35%),
+        #1a0a0a 100%
+    );
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Consolas', monospace;
+    font-size: 0.7rem;
+    font-weight: bold;
+    color: #ffcdd2;
+    letter-spacing: 2px;
+    text-shadow: 0 0 5px rgba(211, 47, 47, 0.8);
+    border-bottom: 1px solid #d32f2f;
+    animation: oxygen-deplete 60s linear infinite;
+}
+
+@keyframes oxygen-deplete {
+    0% { --oxygen-level: 85%; }
+    100% { --oxygen-level: 5%; }
+}
+
+/* CSS Houdini not universally supported, use gradient animation instead */
+body.theme-oxygen::before {
+    animation: oxygen-bar 60s linear infinite;
+}
+
+@keyframes oxygen-bar {
+    0% { background: linear-gradient(90deg, #d32f2f 0%, #d32f2f 85%, #4a1c1c 85%, #1a0a0a 100%); }
+    10% { background: linear-gradient(90deg, #d32f2f 0%, #d32f2f 77%, #4a1c1c 77%, #1a0a0a 100%); }
+    20% { background: linear-gradient(90deg, #d32f2f 0%, #d32f2f 68%, #4a1c1c 68%, #1a0a0a 100%); }
+    30% { background: linear-gradient(90deg, #c62828 0%, #c62828 60%, #4a1c1c 60%, #1a0a0a 100%); }
+    40% { background: linear-gradient(90deg, #c62828 0%, #c62828 50%, #4a1c1c 50%, #1a0a0a 100%); }
+    50% { background: linear-gradient(90deg, #b71c1c 0%, #b71c1c 40%, #4a1c1c 40%, #1a0a0a 100%); }
+    60% { background: linear-gradient(90deg, #b71c1c 0%, #b71c1c 32%, #4a1c1c 32%, #1a0a0a 100%); }
+    70% { background: linear-gradient(90deg, #ff5252 0%, #ff5252 22%, #4a1c1c 22%, #1a0a0a 100%); }
+    80% { background: linear-gradient(90deg, #ff5252 0%, #ff5252 15%, #4a1c1c 15%, #1a0a0a 100%); }
+    90% { background: linear-gradient(90deg, #ff1744 0%, #ff1744 8%, #4a1c1c 8%, #1a0a0a 100%); }
+    100% { background: linear-gradient(90deg, #ff1744 0%, #ff1744 2%, #4a1c1c 2%, #1a0a0a 100%); }
+}
+
+body.theme-oxygen .container {
+    padding-top: 40px;
+}
+
+body.theme-oxygen header h1 {
+    color: #ff5252;
+    text-shadow: 0 0 20px rgba(255, 82, 82, 0.5);
+    animation: warning-flash 3s ease-in-out infinite;
+}
+
+@keyframes warning-flash {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+body.theme-oxygen .subtitle {
+    color: #ef9a9a;
+}
+
+body.theme-oxygen .input-section {
+    background: #2d1111;
+    border: 1px solid #4a1c1c;
+    box-shadow: 0 0 20px rgba(211, 47, 47, 0.1), inset 0 0 30px rgba(0, 0, 0, 0.3);
+}
+
+body.theme-oxygen .input-group input {
+    background: #1a0a0a;
+    color: #ffcdd2;
+    border-color: #4a1c1c;
+}
+
+body.theme-oxygen .input-group button {
+    background: #d32f2f;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+body.theme-oxygen .input-group button:hover {
+    background: #ff5252;
+    box-shadow: 0 0 15px rgba(255, 82, 82, 0.4);
+}
+
+body.theme-oxygen .summary {
+    background: linear-gradient(135deg, #b71c1c, #880e0e, #4a0000);
+    border-bottom: 2px solid #ff5252;
+}
+
+body.theme-oxygen .stat-box {
+    background: #1a0a0a;
+    border: 1px solid #4a1c1c;
+}
+
+body.theme-oxygen .stat-value {
+    color: #ff5252;
+    text-shadow: 0 0 8px rgba(255, 82, 82, 0.5);
+}
+
+body.theme-oxygen .stats-row {
+    background: #220d0d;
+}
+
+body.theme-oxygen .results {
+    border: 1px solid #4a1c1c;
+    box-shadow: 0 0 20px rgba(211, 47, 47, 0.1);
+}
+
+body.theme-oxygen thead {
+    background: #2d1111;
+}
+
+body.theme-oxygen th {
+    color: #ef9a9a;
+    border-bottom-color: #4a1c1c;
+}
+
+body.theme-oxygen td {
+    border-bottom-color: #3a1515;
+}
+
+body.theme-oxygen tbody tr:hover {
+    background: #3a1515;
+}
+
+body.theme-oxygen .market-link {
+    color: #ff8a80;
+}
+
+body.theme-oxygen .position-yes {
+    background: #1b3a1b;
+    color: #66bb6a;
+    border: 1px solid #2e7d32;
+}
+
+body.theme-oxygen .position-no {
+    background: #3a1515;
+    color: #ff5252;
+    border: 1px solid #d32f2f;
+}
+
+body.theme-oxygen .theme-switcher select {
+    background: #2d1111;
+    color: #ffcdd2;
+    border-color: #4a1c1c;
+}
+
+body.theme-oxygen .theme-switcher label {
+    color: #ef9a9a;
+}
+
+body.theme-oxygen footer {
+    color: #ef9a9a;
+}
+
+body.theme-oxygen footer a {
+    color: #ff8a80;
+}
+
+body.theme-oxygen .error {
+    background: #3a1515;
+    border-color: #ff5252;
+    color: #ff8a80;
+}
+
+/* ============================================
+   THEME: How It's Made: Manifold Markets
+   Blueprint/industrial, technical fonts, gears
+   ============================================ */
+
+body.theme-howitsmade {
+    --primary-color: #1565c0;
+    --primary-dark: #0d47a1;
+    --background: #0d2137;
+    --card-bg: #102a44;
+    --text-primary: #bbdefb;
+    --text-secondary: #90caf9;
+    --border-color: #1a4a72;
+    --success-color: #4caf50;
+    --error-color: #ef5350;
+    --warning-color: #ffb74d;
+    font-family: 'Consolas', 'Andale Mono', 'Courier New', monospace;
+}
+
+body.theme-howitsmade {
+    background-color: #0d2137;
+    background-image:
+        linear-gradient(rgba(21, 101, 192, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(21, 101, 192, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+body.theme-howitsmade header h1 {
+    color: #64b5f6;
+    font-weight: 400;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-size: 1.8rem;
+}
+
+body.theme-howitsmade header h1::before {
+    content: '\2699 ';
+}
+
+body.theme-howitsmade header h1::after {
+    content: ' \2699';
+}
+
+body.theme-howitsmade .subtitle {
+    color: #90caf9;
+    font-style: italic;
+    letter-spacing: 1px;
+}
+
+body.theme-howitsmade .subtitle::before {
+    content: '// ';
+    color: #546e7a;
+}
+
+body.theme-howitsmade .input-section {
+    background: #102a44;
+    border: 1px solid #1a4a72;
+    box-shadow: none;
+    position: relative;
+}
+
+body.theme-howitsmade .input-section::before {
+    content: 'INPUT MODULE v2.1';
+    position: absolute;
+    top: 8px;
+    left: 12px;
+    font-size: 0.65rem;
+    color: #546e7a;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+body.theme-howitsmade .input-section label {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+    margin-top: 10px;
+}
+
+body.theme-howitsmade .input-group input {
+    background: #0d2137;
+    color: #bbdefb;
+    border-color: #1a4a72;
+    border-radius: 2px;
+    font-family: 'Consolas', monospace;
+}
+
+body.theme-howitsmade .input-group button {
+    background: #1565c0;
+    border-radius: 2px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: 'Consolas', monospace;
+}
+
+body.theme-howitsmade .input-group button:hover {
+    background: #1976d2;
+}
+
+body.theme-howitsmade .summary {
+    background: linear-gradient(135deg, #0d47a1, #1565c0);
+    border-bottom: 2px solid #42a5f5;
+}
+
+body.theme-howitsmade .summary::before {
+    content: 'ANALYSIS OUTPUT';
+    display: block;
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    opacity: 0.6;
+    margin-bottom: 8px;
+}
+
+body.theme-howitsmade .stat-box {
+    background: #0d2137;
+    border: 1px solid #1a4a72;
+    border-radius: 2px;
+}
+
+body.theme-howitsmade .stat-value {
+    color: #42a5f5;
+    font-family: 'Consolas', monospace;
+}
+
+body.theme-howitsmade .stat-label {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.7rem;
+}
+
+body.theme-howitsmade .stats-row {
+    background: #0a1f33;
+}
+
+body.theme-howitsmade .results {
+    border: 1px solid #1a4a72;
+    border-radius: 2px;
+}
+
+body.theme-howitsmade thead {
+    background: #0a1f33;
+}
+
+body.theme-howitsmade th {
+    color: #90caf9;
+    border-bottom-color: #1a4a72;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+}
+
+body.theme-howitsmade td {
+    border-bottom-color: #1a3a55;
+    font-size: 0.85rem;
+}
+
+body.theme-howitsmade tbody tr:hover {
+    background: #1a3a55;
+}
+
+body.theme-howitsmade .market-link {
+    color: #64b5f6;
+}
+
+body.theme-howitsmade .position-yes {
+    background: #1b3a1b;
+    color: #81c784;
+    border: 1px solid #388e3c;
+    border-radius: 2px;
+}
+
+body.theme-howitsmade .position-no {
+    background: #3a1515;
+    color: #ef5350;
+    border: 1px solid #c62828;
+    border-radius: 2px;
+}
+
+body.theme-howitsmade .theme-switcher select {
+    background: #102a44;
+    color: #bbdefb;
+    border-color: #1a4a72;
+    border-radius: 2px;
+    font-family: 'Consolas', monospace;
+}
+
+body.theme-howitsmade .theme-switcher label {
+    color: #90caf9;
+    letter-spacing: 2px;
+}
+
+body.theme-howitsmade footer {
+    color: #78909c;
+    border-top: 1px solid #1a4a72;
+}
+
+body.theme-howitsmade footer::before {
+    content: '--- END OF REPORT ---';
+    display: block;
+    text-align: center;
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    color: #546e7a;
+    margin-bottom: 15px;
+}
+
+body.theme-howitsmade footer a {
+    color: #64b5f6;
+}
+
+body.theme-howitsmade .error {
+    background: #2d1111;
+    border-color: #ef5350;
+    color: #ef9a9a;
+    border-radius: 2px;
+}
+
+body.theme-howitsmade .spinner {
+    border-color: #1a4a72;
+    border-top-color: #42a5f5;
+}
+
+/* ============================================
+   Shared overrides for dark themes
+   Ensures loading/error states work in dark
+   ============================================ */
+
+body.theme-myspace .spinner,
+body.theme-oxygen .spinner {
+    border-color: rgba(255, 255, 255, 0.1);
+    border-top-color: var(--primary-color);
+}
+
+body.theme-myspace .loading,
+body.theme-oxygen .loading,
+body.theme-howitsmade .loading {
+    color: var(--text-primary);
+}
+
+body.theme-myspace .loading-detail,
+body.theme-oxygen .loading-detail,
+body.theme-howitsmade .loading-detail {
+    color: var(--text-secondary);
+}
+
+body.theme-myspace .hint,
+body.theme-oxygen .hint,
+body.theme-howitsmade .hint {
+    color: var(--text-secondary);
+}
